@@ -1,0 +1,70 @@
+<html>
+
+<head>
+  <script type="text/javascript" src="weather.js"></script>
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+  </script>
+  <script type="text/javascript">
+    function findWeather() {
+      $("#weatherTable").text('');
+      var now = new Date();
+
+      for (var i = 0; i < WeatherFinder.weatherList.length; i++) {
+        var zone = WeatherFinder.weatherList[i];
+        if(zone.targetWeathers.length == 0) continue;
+        $("#weatherTable").append('<div></div><h3>' + zone.name + "</h3>");
+
+        var weatherStartTime = WeatherFinder.getWeatherTimeFloor(new Date()).getTime();
+        var weatherStartHour = WeatherFinder.getEorzeaHour(weatherStartTime);
+        var weather = WeatherFinder.getWeather(weatherStartTime, zone.name);
+        var prevWeather = WeatherFinder.getWeather(weatherStartTime - 1, zone.name);
+
+        var flags = new Array(zone.targetWeathers.length).fill(false);
+        var tries = 0;
+        while (tries < 125) {
+          for (var j in zone.targetWeathers) {
+            if(flags[j]) continue;
+            var tw = zone.targetWeathers[j];
+
+            console.log(tries);
+            if (tw == weather && tw != prevWeather) {
+              var leftTime = (new Date(weatherStartTime) - now) / 1000 / 60
+              if (leftTime < 0) continue;
+              $("#weatherTable").append('<p>' + weather + '까지 ' + Math.floor(leftTime) + '분</p>');
+              flags[j] = true;
+              break;
+            }
+          }
+
+          if(flags.every(isTrue)) break; 
+
+          weatherStartTime += 8 * 175 * 1000; // Increment by 8 Eorzean hours
+          weatherStartHour = WeatherFinder.getEorzeaHour(weatherStartTime);
+          prevWeather = weather;
+          weather = WeatherFinder.getWeather(weatherStartTime, zone.name);
+          tries++;
+        }
+      }
+    }
+
+    function isTrue(currentValue) {
+      return currentValue == true;
+    }
+
+    function onLoad() {
+      findWeather();
+      setTimeout(onLoad, 1000 * 1 * 1);
+    }
+  </script>
+</head>
+
+<body onload="onLoad();">
+  <div class="container">
+    <h1>Eureka NM trigger weather timer</h1>
+    <div id="weatherTable"></div>
+  </div>
+
+</body>
+
+</html>
