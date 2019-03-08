@@ -98,15 +98,11 @@ function getWeathers() {
     var flags = new Array(zone.trigger.length).fill(false);
     var tries = 0;
     while (tries < 125) {
-      if (tries == 0) {
-        tries++;
-        continue;
-      }
       for (var j in zone.trigger) {
         if (flags[j]) continue;
         var tw = zone.trigger[j];
         if (tw == weather && tw != prevWeather) {
-          weatherStartTime
+          if (weatherStartTime < new Date()) continue;
           results[zone.name][weather] = weatherStartTime;
           flags[j] = true;
           break;
