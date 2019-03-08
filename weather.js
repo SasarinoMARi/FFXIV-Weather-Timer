@@ -46,9 +46,9 @@ var WeatherFinder = {
     return new Date(startUnixSeconds * 1000);
   },
 
-  getWeatherFromName: function(name) {
-    for(var i = 0; i< this.weatherList.length; i++) {
-      if(this.weatherList[i].name == name) return this.weatherList[i]
+  getWeatherFromName: function (name) {
+    for (var i = 0; i < this.weatherList.length; i++) {
+      if (this.weatherList[i].name == name) return this.weatherList[i]
     }
     return null;
   },
@@ -61,15 +61,15 @@ var WeatherFinder = {
   },
   {
     "name": "Pagos",
-    weathers: ["Clear Skies", "Fog", "Heat Waves", "Snow", "Thunder", "Brizzards"],
-    chances: function (chance) { if ((chance -= 10) < 0) { return "Clear Skies"; } else if ((chance -= 18) < 0) { return "Fog"; } else if ((chance -= 18) < 0) { return "Heat Waves"; } else if ((chance -= 18) < 0) { return "Snow"; } else if ((chance -= 18) < 0) { return "Thunder"; } else { return "Brizzards"; } },
-    trigger: ["Fog", "Thunder", "Heat Waves", "Brizzards"]
+    weathers: ["Clear Skies", "Fog", "Heat Waves", "Snow", "Thunder", "Blizzards"],
+    chances: function (chance) { if ((chance -= 10) < 0) { return "Clear Skies"; } else if ((chance -= 18) < 0) { return "Fog"; } else if ((chance -= 18) < 0) { return "Heat Waves"; } else if ((chance -= 18) < 0) { return "Snow"; } else if ((chance -= 18) < 0) { return "Thunder"; } else { return "Blizzards"; } },
+    trigger: ["Fog", "Thunder", "Heat Waves", "Blizzards"]
   },
   {
     "name": "Pyros",
     weathers: ["Fair Skies", "Heat Waves", "Thunder", "Blizzards", "Umbral Wind", "Snow"],
     chances: function (chance) { if ((chance -= 10) < 0) { return "Fair Skies"; } else if ((chance -= 18) < 0) { return "Heat Waves"; } else if ((chance -= 18) < 0) { return "Thunder"; } else if ((chance -= 18) < 0) { return "Blizzards"; } else if ((chance -= 18) < 0) { return "Umbral Wind"; } else { return "Snow"; } },
-    trigger: ["Thunder", "Umbral Wind", "Brizzards", "Heat Waves"]
+    trigger: ["Thunder", "Umbral Wind", "Blizzards", "Heat Waves"]
   },
   {
     "name": "Hydatos",
@@ -98,10 +98,15 @@ function getWeathers() {
     var flags = new Array(zone.trigger.length).fill(false);
     var tries = 0;
     while (tries < 125) {
+      if (tries == 0) {
+        tries++;
+        continue;
+      }
       for (var j in zone.trigger) {
         if (flags[j]) continue;
         var tw = zone.trigger[j];
         if (tw == weather && tw != prevWeather) {
+          weatherStartTime
           results[zone.name][weather] = weatherStartTime;
           flags[j] = true;
           break;
@@ -117,6 +122,6 @@ function getWeathers() {
       tries++;
     }
   }
-  
+
   return results;
 }

@@ -10,20 +10,37 @@
 
     function loadWeather() {
       var weathers = getWeathers();
-      
+      console.log(weathers);
+
       var now = new Date();
       var views = $(".weatherView");
-      for(var i = 0; i < views.length; i++) {
+      for (var i = 0; i < views.length; i++) {
         var view = views[i];
 
         var zone = view.attributes["zone"].value;
         var trigger = view.attributes["trigger"].value;
 
         var weather = weathers[zone][trigger];
-        var leftTime = (new Date(weather) - now) / 1000 / 60;
+        console.log(weathers[zone]);
+        console.log(trigger);
+        console.log('');
+        var leftMillis = new Date(weather) - now;
         view.innerText = '';
-        view.append(trigger + '까지 ' + Math.floor(leftTime));
+        view.append(trigger + ' in ' + msToTime(leftMillis));
       }
+    }
+
+    function msToTime(duration) {
+      var milliseconds = parseInt((duration % 1000) / 100)
+        , seconds = parseInt((duration / 1000) % 60)
+        , minutes = parseInt((duration / (1000 * 60)) % 60)
+        , hours = parseInt((duration / (1000 * 60 * 60)) % 24);
+
+      hours = (hours < 10 && hours != 0) ? "0" + hours : hours;
+      minutes = (minutes < 10) ? "0" + minutes : minutes;
+      seconds = (seconds < 10) ? "0" + seconds : seconds;
+
+      return hours != 0 ? hours + ":" + minutes : minutes + " min"
     }
 
     function isTrue(currentValue) {
@@ -43,7 +60,13 @@
       background-size: cover;
     }
 
-    h1, h2, h3, h4, h5, h6 , div{
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    div {
       color: white;
     }
 
@@ -69,18 +92,18 @@
       </div>
       <div class="weatherView" zone="Pagos" trigger="Heat Waves">
       </div>
-      <div class="weatherView" zone="Pagos" trigger="Brizzards">
+      <div class="weatherView" zone="Pagos" trigger="Blizzards">
       </div>
     </div>
     <div class="container">
       <h3>Eureka Pyros</h3>
-      <div class="weatherView" zone="Pagos" trigger="Umbral Wind">
+      <div class="weatherView" zone="Pyros" trigger="Umbral Wind">
       </div>
-      <div class="weatherView" zone="Pagos" trigger="Thunder">
+      <div class="weatherView" zone="Pyros" trigger="Thunder">
       </div>
-      <div class="weatherView" zone="Pagos" trigger="Blizzards">
+      <div class="weatherView" zone="Pyros" trigger="Blizzards">
       </div>
-      <div class="weatherView" zone="Pagos" trigger="Heat Waves">
+      <div class="weatherView" zone="Pyros" trigger="Heat Waves">
       </div>
     </div>
   </div>
