@@ -4,47 +4,25 @@
   <script type="text/javascript" src="weather.js"></script>
   <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="effect.css">
   </script>
   <script type="text/javascript">
-    function findWeather() {
-      $("#weatherTable").text('');
+
+    function loadWeather() {
+      var weathers = getWeathers();
+      
       var now = new Date();
+      var views = $(".weatherView");
+      for(var i = 0; i < views.length; i++) {
+        var view = views[i];
 
-      for (var i = 0; i < WeatherFinder.weatherList.length; i++) {
-        var zone = WeatherFinder.weatherList[i];
-        if (zone.targetWeathers.length == 0) continue;
-        $("#weatherTable").append('<div></div><h3>' + zone.name + "</h3>");
+        var zone = view.attributes["zone"].value;
+        var trigger = view.attributes["trigger"].value;
 
-        var weatherStartTime = WeatherFinder.getWeatherTimeFloor(new Date()).getTime();
-        if ((weatherStartTime + "").endsWith("99999")) weatherStartTime++; // fuck you
-        var weatherStartHour = WeatherFinder.getEorzeaHour(weatherStartTime);
-        var weather = WeatherFinder.getWeather(weatherStartTime, zone.name);
-        var prevWeather = WeatherFinder.getWeather(weatherStartTime - 1, zone.name);
-        
-        var flags = new Array(zone.targetWeathers.length).fill(false);
-        var tries = 0;
-        while (tries < 125) {
-          for (var j in zone.targetWeathers) {
-            if (flags[j]) continue;
-            var tw = zone.targetWeathers[j];
-
-            if (tw == weather && tw != prevWeather) {
-              var leftTime = (new Date(weatherStartTime) - now) / 1000 / 60
-              if (leftTime < 0) continue;
-              $("#weatherTable").append('<p>' + weather + '까지 ' + Math.floor(leftTime) + '분</p>');
-              flags[j] = true;
-              break;
-            }
-          }
-
-          if (flags.every(isTrue)) break;
-
-          weatherStartTime += 8 * 175 * 1000; // Increment by 8 Eorzean hours
-          weatherStartHour = WeatherFinder.getEorzeaHour(weatherStartTime);
-          prevWeather = weather;
-          weather = WeatherFinder.getWeather(weatherStartTime, zone.name);
-          tries++;
-        }
+        var weather = weathers[zone][trigger];
+        var leftTime = (new Date(weather) - now) / 1000 / 60;
+        view.innerText = '';
+        view.append(trigger + '까지 ' + Math.floor(leftTime));
       }
     }
 
@@ -53,16 +31,58 @@
     }
 
     function onLoad() {
-      findWeather();
-      setTimeout(onLoad, 1000 * 1 * 1);
+      loadWeather();
+      setTimeout(onLoad, 1000 * 30 * 1);
     }
   </script>
+  <style>
+    body {
+      background-image: url('background.jpg');
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+
+    h1, h2, h3, h4, h5, h6 , div{
+      color: white;
+    }
+
+    .weatherView {
+      background-color: rgba(255, 0, 0, 0.2)
+    }
+  </style>
 </head>
 
 <body onload="onLoad();">
   <div class="container">
-    <h1>Eureka NM trigger weather timer</h1>
-    <div id="weatherTable"></div>
+    <h1>Eureka Weather Timer</h1>
+    <div class="container">
+      <h3>Eureka Anemos</h3>
+      <div class="weatherView" zone="Anemos" trigger="Gales">
+      </div>
+    </div>
+    <div class="container">
+      <h3>Eureka Pagos</h3>
+      <div class="weatherView" zone="Pagos" trigger="Fog">
+      </div>
+      <div class="weatherView" zone="Pagos" trigger="Thunder">
+      </div>
+      <div class="weatherView" zone="Pagos" trigger="Heat Waves">
+      </div>
+      <div class="weatherView" zone="Pagos" trigger="Brizzards">
+      </div>
+    </div>
+    <div class="container">
+      <h3>Eureka Pyros</h3>
+      <div class="weatherView" zone="Pagos" trigger="Umbral Wind">
+      </div>
+      <div class="weatherView" zone="Pagos" trigger="Thunder">
+      </div>
+      <div class="weatherView" zone="Pagos" trigger="Blizzards">
+      </div>
+      <div class="weatherView" zone="Pagos" trigger="Heat Waves">
+      </div>
+    </div>
   </div>
 
 </body>

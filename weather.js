@@ -54,27 +54,69 @@ var WeatherFinder = {
   },
 
   weatherList: [{
-    "name": "Eureka Anemos",
+    "name": "Anemos",
     weathers: ["Fair Skies", "Gales", "Showers", "Snow"],
     chances: function (chance) { if ((chance -= 30) < 0) { return "Fair Skies"; } else if ((chance -= 30) < 0) { return "Gales"; } else if ((chance -= 30) < 0) { return "Showers"; } else { return "Snow"; } },
-    targetWeathers: ["Gales"]
+    trigger: ["Gales"]
   },
   {
-    "name": "Eureka Pagos",
+    "name": "Pagos",
     weathers: ["Clear Skies", "Fog", "Heat Waves", "Snow", "Thunder", "Brizzards"],
     chances: function (chance) { if ((chance -= 10) < 0) { return "Clear Skies"; } else if ((chance -= 18) < 0) { return "Fog"; } else if ((chance -= 18) < 0) { return "Heat Waves"; } else if ((chance -= 18) < 0) { return "Snow"; } else if ((chance -= 18) < 0) { return "Thunder"; } else { return "Brizzards"; } },
-    targetWeathers: ["Fog", "Thunder", "Heat Waves", "Brizzards"]
+    trigger: ["Fog", "Thunder", "Heat Waves", "Brizzards"]
   },
   {
-    "name": "Eureka Pyros",
+    "name": "Pyros",
     weathers: ["Fair Skies", "Heat Waves", "Thunder", "Blizzards", "Umbral Wind", "Snow"],
     chances: function (chance) { if ((chance -= 10) < 0) { return "Fair Skies"; } else if ((chance -= 18) < 0) { return "Heat Waves"; } else if ((chance -= 18) < 0) { return "Thunder"; } else if ((chance -= 18) < 0) { return "Blizzards"; } else if ((chance -= 18) < 0) { return "Umbral Wind"; } else { return "Snow"; } },
-    targetWeathers: ["Thunder", "Umbral Wind", "Brizzards", "Heat Waves"]
+    trigger: ["Thunder", "Umbral Wind", "Brizzards", "Heat Waves"]
   },
   {
-    "name": "Eureka Hydatos",
+    "name": "Hydatos",
     weathers: ["Fair Skies", "Showers", "Gloom", "Thunderstorms", "Snow"],
     chances: function (chance) { if ((chance -= 12) < 0) { return "Fair Skies"; } else if ((chance -= 22) < 0) { return "Showers"; } else if ((chance -= 22) < 0) { return "Gloom"; } else if ((chance -= 22) < 0) { return "Thunderstorms"; } else { return "Snow"; } },
-    targetWeathers: []
+    trigger: []
   }]
 };
+
+function getWeathers() {
+  var results = {};
+
+  for (var i = 0; i < WeatherFinder.weatherList.length; i++) {
+    var zone = WeatherFinder.weatherList[i];
+    if (zone.trigger.length == 0) continue;
+    results[zone.name] = {};
+
+    var weatherStartTime = WeatherFinder.getWeatherTimeFloor(new Date()).getTime();
+    if ((weatherStartTime + "").endsWith("99999")) weatherStartTime++; // fuck you
+    var weatherStartHour = WeatherFinder.getEorzeaHour(weatherStartTime);
+    var weather = WeatherFinder.getWeather(weatherStartTime, zone.name);
+    var prevWeather = WeatherFinder.getWeather(weatherStartTime - 1, zone.name);
+
+    results[zone.name]['Current'] = weather;
+
+    var flags = new Array(zone.trigger.length).fill(false);
+    var tries = 0;
+    while (tries < 125) {
+      for (var j in zone.trigger) {
+        if (flags[j]) continue;
+        var tw = zone.trigger[j];
+        if (tw == weather && tw != prevWeather) {
+          results[zone.name][weather] = weatherStartTime;
+          flags[j] = true;
+          break;
+        }
+      }
+
+      if (flags.every(isTrue)) break;
+
+      weatherStartTime += 8 * 175 * 1000; // Increment by 8 Eorzean hours
+      weatherStartHour = WeatherFinder.getEorzeaHour(weatherStartTime);
+      prevWeather = weather;
+      weather = WeatherFinder.getWeather(weatherStartTime, zone.name);
+      tries++;
+    }
+  }
+  
+  return results;
+}
