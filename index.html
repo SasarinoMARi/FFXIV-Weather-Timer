@@ -1,6 +1,8 @@
 <html>
 
 <head>
+  <link rel="shortcut icon" type="image/png" href="icon.png"/>
+  <title>Eureka Weather Timer</title>
   <script type="text/javascript" src="weather.js"></script>
   <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
@@ -13,10 +15,7 @@
       console.log(weathers);
 
       var now = new Date();
-      var views = $(".weatherView");
-      for (var i = 0; i < views.length; i++) {
-        var view = views[i];
-
+      var views = $(".weatherView").each(function (i, view) {
         var zone = view.attributes["zone"].value;
         var trigger = view.attributes["trigger"].value;
 
@@ -25,9 +24,12 @@
         console.log(trigger);
         console.log('');
         var leftMillis = new Date(weather) - now;
-        view.innerText = '';
-        view.append(trigger + ' in ' + msToTime(leftMillis));
-      }
+
+        var textView =  $(this).find('.startTime');
+        textView.innerText = '';
+        textView.text('');
+        textView.append(trigger + ' in ' + msToTime(leftMillis));
+      });
     }
 
     function msToTime(duration) {
@@ -65,13 +67,15 @@
     h3,
     h4,
     h5,
-    h6,
+    h5,
     div {
       color: white;
     }
 
     .weatherView {
-      background-color: rgba(255, 0, 0, 0.2)
+      padding: 0.5em;
+      margin: 0.2em;
+      background-color: rgba(255, 255, 255, 0.15)
     }
   </style>
 </head>
@@ -82,28 +86,37 @@
     <div class="container">
       <h3>Eureka Anemos</h3>
       <div class="weatherView" zone="Anemos" trigger="Gales">
+        <h5 class="startTime"></h5>
       </div>
     </div>
     <div class="container">
       <h3>Eureka Pagos</h3>
       <div class="weatherView" zone="Pagos" trigger="Fog">
+          <h5 class="startTime"></h5>
       </div>
       <div class="weatherView" zone="Pagos" trigger="Thunder">
+        <h5 class="startTime"></h5>
       </div>
       <div class="weatherView" zone="Pagos" trigger="Heat Waves">
+        <h5 class="startTime"></h5>
       </div>
       <div class="weatherView" zone="Pagos" trigger="Blizzards">
+        <h5 class="startTime"></h5>
       </div>
     </div>
     <div class="container">
       <h3>Eureka Pyros</h3>
       <div class="weatherView" zone="Pyros" trigger="Umbral Wind">
+        <h5 class="startTime"></h5>
       </div>
       <div class="weatherView" zone="Pyros" trigger="Thunder">
+        <h5 class="startTime"></h5>
       </div>
       <div class="weatherView" zone="Pyros" trigger="Blizzards">
+        <h5 class="startTime"></h5>
       </div>
       <div class="weatherView" zone="Pyros" trigger="Heat Waves">
+        <h5 class="startTime"></h5>
       </div>
     </div>
   </div>
